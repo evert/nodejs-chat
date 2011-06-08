@@ -1,0 +1,123 @@
+/* Simple resets */
+body {
+    margin: 0;
+    height: 100%;
+    background: grey;
+    font-family: sans-serif;
+
+}
+ul,p {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.template {
+    display: none !important;
+}
+
+section.onlineUsers {
+    width: 200px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid black; 
+}
+
+section.messages {
+    position: fixed;
+    top: 0;
+    right: 200px;
+    bottom: 25px;
+    left: 0;
+    background: white;
+    overflow: auto;
+}
+
+section.messages li {
+    display: block;
+    padding: 4px 20px 5px 65px; 
+    margin: 10px;
+    background: #EEE;
+  
+    /* This is for the gravatar background */
+    background-repeat: no-repeat;
+
+    border-radius: 15px; 
+
+    box-shadow: 3px 3px 5px #CCC;
+
+    /* Thank you microsoft for your gradient generator */
+
+    /* IE10 */ 
+    background-image: -ms-linear-gradient(top, #E6E6E6 0%, #FFFFFF 100%);
+
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(top, #E6E6E6 0%, #FFFFFF 100%);
+
+    /* Opera */ 
+    background-image: -o-linear-gradient(top, #E6E6E6 0%, #FFFFFF 100%);
+
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #E6E6E6), color-stop(1, #FFFFFF));
+
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(top, #E6E6E6 0%, #FFFFFF 100%);
+
+    /* Proposed W3C Markup */ 
+    background-image: linear-gradient(top, #E6E6E6 0%, #FFFFFF 100%);
+
+
+}
+section.messages div.author {
+    font-weight: bold;
+    float: left;
+    padding-right: 10px;
+}
+
+section.messages time {
+    font-size: 90%;
+    color: #555;
+}
+section.messages time:before {
+    font-size: 90%;
+    color: #555;
+    content: "at "
+}
+section.messages p {
+    padding-top: 10px;
+}
+
+
+section.inputArea {
+    background: white; 
+    position: fixed;
+    bottom: 0;
+    height: 25px;
+    left: 0;
+    right: 200px;
+    border-top: 1px solid black; 
+}
+
+section.inputArea input {
+    border: 0;
+    font-size: 110%;
+    width: 100%;
+}
+
+section.inputArea button {
+    display: block;
+    position: fixed;
+    right: 200px;
+    bottom: 0;
+    float: right;
+    border: 0;
+    background: #AACCAA;
+    color: white;
+    font-size: 110%;
+    font-weight: bold;
+    height: 25px;
+    width: 100px;
+}
+
