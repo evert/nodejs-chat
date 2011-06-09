@@ -4,6 +4,15 @@
 $(function() {
 
     /**
+     * ChatApp namespace
+     * ================
+     *
+     * The ChatApp namespace contains all the other objects in this
+     * application.
+     */
+    window.ChatApp = { };
+
+    /**
      * Message Model
      * ===================
      *
@@ -11,7 +20,7 @@ $(function() {
      *
      * Messages have a 'dateTime', a 'nickName' and a 'content' attribute. 
      */
-    window.Message = Backbone.Model.extend({
+    window.ChatApp.Message = Backbone.Model.extend({
 
         initialize : function() {
 
@@ -33,12 +42,41 @@ $(function() {
      *
      * The messages collection contains the list of messages.
      */
-    window.MessageCollection = Backbone.Collection.extend({
+    window.ChatApp.MessageCollection = Backbone.Collection.extend({
         
-        model: Message
+        model: ChatApp.Message
 
     });
 
+    /**
+     * User Model
+     * ==========
+     *
+     * The users model represents a single (online) user.
+     */
+    window.ChatApp.User = Backbone.Model.extend({
+
+        initialize : function() {
+
+            if (!this.get('gravatar')) {
+                this.set({ gravatar: 'http://www.gravatar.com/avatar/7d76e2bb6f8c962a5628093c9f5bc6fb'});
+            }
+
+        }
+
+    });
+
+    /**
+     * User Collection 
+     * ===============
+     *
+     * The user collection contains the list of online users.
+     */
+    window.ChatApp.UserCollection = Backbone.Collection.extend({
+        
+        model: ChatApp.User
+
+    });
 
     /**
      * MessageList view
@@ -48,7 +86,7 @@ $(function() {
      * You must pass a 'collection' option, which should be an instance of
      * MessageCollection
      */
-    window.MessageListView = Backbone.View.extend({
+    window.ChatApp.MessageListView = Backbone.View.extend({
 
         initialize : function() {
 
@@ -104,7 +142,7 @@ $(function() {
      * You must pass a 'collection' option, which should be an instance of
      * MessageCollection
      */
-    window.MessageInputView = Backbone.View.extend({
+    window.ChatApp.MessageInputView = Backbone.View.extend({
 
         events: {
             "click button" : "submitMessage"
@@ -128,6 +166,8 @@ $(function() {
                 message: input.val()
             };
 
+            if (message.message.length < 1) return;
+
             // Adding a new message to the collection 
             this.collection.add(message);
 
@@ -137,32 +177,93 @@ $(function() {
         } 
 
     });
+        
+    /**
+     * UserList view
+     * ================
+     *
+     * This view is responsible for keeping the list of online users up to
+     * date. 
+     * You must pass a 'collection' option, which should be an instance of
+     * UserCollection
+     */
+    window.ChatApp.UserListView = Backbone.View.extend({
 
-    window.ChatApp = Backbone.View.extend({
+        initialize : function() {
+
+            if (!this.collection) {
+                throw "To initialize the MessageList view, you must pass the 'collection' option.";
+            }
+
+            var self = this;
+            this.collection.bind('add', function(user) {
+                self.addUser(user);
+            });
+
+        },
+
+        addUser : function(user) {
+
+            var newElem = this.$('li.template').clone();
+            newElem.removeClass('template');
+
+            newElem.text(user.get('nickName'));
+
+            newElem.css({
+                backgroundImage: "url('" + user.get('gravatar') + "?s=25')"
+            });
+            this.el.append(newElem);
+
+        },
+
+        
+    });
+
+    /**
+     * The Application View
+     * ====================
+     *
+     * The Application View is basically the main Application controller, and
+     * is responsible for setting up all the other objects.
+     */
+    window.ChatApp.Application = Backbone.View.extend({
 
         messageCollection : null,
+        userCollection : null,
+
         messageListView : null,
         messageInputView : null,
+
+        userListView : null,
 
         el: 'body',
 
         initialize : function() {
 
-            this.messageCollection = new MessageCollection();
-            this.messageListView = new MessageListView({
+            this.messageCollection = new ChatApp.MessageCollection();
+            this.userCollection = new ChatApp.UserCollection();
+            this.messageListView = new ChatApp.MessageListView({
                 collection: this.messageCollection,
                 el : this.$('section.messages')
             });
-            this.messageInputView = new MessageInputView({
+            this.messageInputView = new ChatApp.MessageInputView({
                 collection: this.messageCollection,
                 el: this.$('section.inputArea')
             }); 
+            this.userListView = new ChatApp.UserListView({
+                collection: this.userCollection,
+                el: this.$('section.userList')
+            }); 
+
+            this.userCollection.add({
+                nickName : 'TAFKAP'
+            });
 
         },
 
     });
 
-    window.chatApp = new ChatApp;
+    window.ChatApp.application = new ChatApp.Application;
    
 
 });
