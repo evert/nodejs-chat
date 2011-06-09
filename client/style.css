@@ -7,7 +7,7 @@ body {
     font-size: 14px;
 
 }
-ul,p {
+ul,p, h1 {
     padding: 0;
     margin: 0;
     list-style: none;
@@ -15,6 +15,38 @@ ul,p {
 
 .template {
     display: none !important;
+}
+
+section.welcome {
+    background-color: #262626;
+    position: absolute; 
+    z-index: 10000;
+    width: 500px;
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    left: 50%;
+    margin-left: -265px;
+    top: 150px;
+}
+section.welcome label {
+    width: 130px;
+    display: inline-block;
+    margin-top: 15px;
+}
+section.welcome button {
+    display: inline-block;
+    margin-top: 15px;
+    width: 100px;
+}
+section.welcome input {
+    width: 200px;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+section.welcome h1 {
+    padding-bottom: 20px;
 }
 
 section.userList {
@@ -45,6 +77,9 @@ section.userList li {
     border-radius: 10px; 
 
     box-shadow: 3px 3px 5px #222;
+
+    width: 100%;
+    overflow: hidden;
 
 }
 

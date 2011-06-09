@@ -28,9 +28,6 @@ $(function() {
             if (!this.get('dateTime')) {
                 this.set({ dateTime: new Date() });
             }
-            if (!this.get('gravatar')) {
-                this.set({ gravatar: 'http://www.gravatar.com/avatar/7d76e2bb6f8c962a5628093c9f5bc6fb'});
-            }
 
         }        
 
@@ -58,9 +55,6 @@ $(function() {
 
         initialize : function() {
 
-            if (!this.get('gravatar')) {
-                this.set({ gravatar: 'http://www.gravatar.com/avatar/7d76e2bb6f8c962a5628093c9f5bc6fb'});
-            }
 
         }
 
@@ -75,6 +69,89 @@ $(function() {
     window.ChatApp.UserCollection = Backbone.Collection.extend({
         
         model: ChatApp.User
+
+    });
+
+    /**
+     * Connection
+     * ==========
+     *
+     * The connection is responsible for connecting to the server, sending
+     * messages and receiving events.
+     */
+    window.ChatApp.Connection = function(userCollection, messageCollection, nickName, email) {
+
+        this.userCollection = userCollection;
+        this.messageCollection = messageCollection;
+        this.nickName = nickName;
+        this.email = email;
+
+        this.listen();
+        this.join();
+
+    };
+    _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
+
+        userCollection : null,
+        messageCollection : null,
+        lastSequence : 0,
+
+        listen : function() {
+
+            var self = this;
+
+            $.ajax('/eventpoll?since=' + this.lastSequence + '&nickName=' + this.nickName + '&email=' + this.email, {
+                dataType : 'json',
+                complete : function(jqXHR, textStatus) {
+                    self.listen();
+                },
+                success : function(data) {
+                    for(var ii=0;ii<data.length;ii++) {
+                        var event = data[ii];
+                        self.lastSequence = event.sequence;
+                        switch(event.type) {
+
+                            case 'message' :
+                                self.messageCollection.add({
+                                    message : event.message,
+                                    nickName : event.nickName,
+                                    dateTime : new Date(event.dateTime),
+                                    gravatar : event.gravatar
+                                });
+                                break;
+                            case 'join' :
+                                self.userCollection.add({
+                                    nickName : event.nickName,
+                                    gravatar : event.gravatar
+                                });
+                                break;
+                            case 'part' :
+                                self.userCollection.remove(
+                                    self.userCollection.find(
+                                        function(item) { return item.get('nickName') === event.nickName; }
+                                    )
+                                );
+                                break;
+
+                        }
+                    }
+                }
+
+            });
+
+        },
+
+        join : function() {
+
+            $.ajax('/join?nickName=' + this.nickName + '&email=' + this.email);
+
+        },
+
+        message : function(message) {
+
+            $.ajax('/message?nickName=' + this.nickName + '&email=' + this.email + '&message=' + message);
+
+        }
 
     });
 
@@ -106,7 +183,7 @@ $(function() {
             var newElem = this.$('li.template').clone();
             newElem.removeClass('template');
 
-            newElem.find('.author').text(message.get('author'));
+            newElem.find('.nickName').text(message.get('nickName'));
 
             var ft = message.get('dateTime');
 
@@ -121,7 +198,7 @@ $(function() {
             newElem.find('time').text(formattedTime);
             newElem.find('p').text(message.get('message'));
             newElem.css({
-                backgroundImage: "url('" + message.get('gravatar') + "?s=55')"
+                backgroundImage: "url('" + message.get('gravatar') + "?s=55&d=retro')"
             });
             this.el.append(newElem);
 
@@ -139,19 +216,19 @@ $(function() {
      * This view is responsible for the 'input' area, which allows the user to
      * send a message to the chatroom.
      *
-     * You must pass a 'collection' option, which should be an instance of
-     * MessageCollection
+     * You must pass a 'connection' option, which should be an instance of
+     * ChatApp.connection 
      */
     window.ChatApp.MessageInputView = Backbone.View.extend({
 
         events: {
-            "click button" : "submitMessage"
+            "submit form" : "submitMessage"
         },
 
         initialize : function() {
 
-            if (!this.collection) {
-                throw "To initialize the MessageList view, you must pass the 'collection' option.";
+            if (!this.options.connection) {
+                throw "To initialize the MessageInputView, you must pass the 'connection' option.";
             }
 
         },
@@ -169,7 +246,7 @@ $(function() {
             if (message.message.length < 1) return;
 
             // Adding a new message to the collection 
-            this.collection.add(message);
+            this.options.connection.message(message.message);
 
             // Resetting the input field
             input.val(''); 
@@ -199,6 +276,9 @@ $(function() {
             this.collection.bind('add', function(user) {
                 self.addUser(user);
             });
+            this.collection.bind('remove', function(user) {
+                self.removeUser(user);
+            });
 
         },
 
@@ -208,15 +288,44 @@ $(function() {
             newElem.removeClass('template');
 
             newElem.text(user.get('nickName'));
+            newElem.attr('id','user-' + user.get('nickName'));
 
             newElem.css({
-                backgroundImage: "url('" + user.get('gravatar') + "?s=25')"
+                backgroundImage: "url('" + user.get('gravatar') + "?s=25&d=retro')"
             });
             this.el.append(newElem);
 
         },
 
+        removeUser : function(user) {
+
+           $('#user-' + user.get('nickName')).remove(); 
+
+        },
+
         
+    });
+
+    window.ChatApp.WelcomeView = Backbone.View.extend({
+
+        events : {
+            "submit form" : "connect"
+        },
+
+        connect : function(evt) {
+
+            evt.preventDefault();
+            this.el.hide();
+            var nickName = this.$('input[name=nickName]').val();
+            var email = this.$('input[name=email]').val();
+
+            this.trigger('connect', {
+                nickName : nickName,
+                email : email
+            });
+
+        }
+
     });
 
     /**
@@ -233,21 +342,45 @@ $(function() {
 
         messageListView : null,
         messageInputView : null,
-
         userListView : null,
+        welcomeView : null,
+
+        connection : null,
+
+        nickName : null,
+        email : null,
 
         el: 'body',
 
         initialize : function() {
 
+            var self = this;
+
             this.messageCollection = new ChatApp.MessageCollection();
             this.userCollection = new ChatApp.UserCollection();
+
+
+
+            this.welcomeView = new ChatApp.WelcomeView({
+                el : this.$('section.welcome')
+            });
+            this.welcomeView.bind('connect', function(userInfo) {
+                self.nickName = userInfo.nickName;
+                self.email = userInfo.email;
+                self.initializeConnection();
+            });
+
+        }, 
+        initializeConnection : function() {
+
+            this.connection = new ChatApp.Connection(this.userCollection, this.messageCollection, this.nickName, this.email);
+
             this.messageListView = new ChatApp.MessageListView({
                 collection: this.messageCollection,
                 el : this.$('section.messages')
             });
             this.messageInputView = new ChatApp.MessageInputView({
-                collection: this.messageCollection,
+                connection: this.connection,
                 el: this.$('section.inputArea')
             }); 
             this.userListView = new ChatApp.UserListView({
@@ -255,9 +388,6 @@ $(function() {
                 el: this.$('section.userList')
             }); 
 
-            this.userCollection.add({
-                nickName : 'TAFKAP'
-            });
 
         },
 
