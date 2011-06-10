@@ -56,6 +56,7 @@ ChatEvents.prototype.emit = function(eventName, eventData) {
     this.sequence++;
     eventData.sequence = this.sequence;
     eventData.dateTime = new Date();
+    console.log("Event is pushed with sequence: " + this.sequence);
     this.previousEvents.push(eventData);
 
     ChatEvents.super_.prototype.emit.apply(this,[eventName,eventData]);
@@ -77,6 +78,7 @@ var chatEvents = new ChatEvents();
 /** Helper functions for 'currentUsers' **/
 function updateLastSeen(userInfo, longPoll) {
 
+    console.log('updateLastSeen: ' + userInfo.nickName);
     var found = null;
     for(var ii=0; ii < currentUsers.length; ii++) {
         if (currentUsers[ii].nickName === userInfo.nickName) {
@@ -86,11 +88,13 @@ function updateLastSeen(userInfo, longPoll) {
     }
 
     if (found) {
+        console.log('found');
         found.lastSeen = new Date();
         if (longPoll !== undefined) {
             found.longPoll = longPoll;
         }
     } else {
+        console.log('not found');
         userInfo.lastSeen = new Date();
         if (longPoll !== undefined) {
             userInfo.longPoll = longPoll;
@@ -108,6 +112,8 @@ function updateLastSeen(userInfo, longPoll) {
 
 setInterval(function() {
 
+    console.log('Cleanup sequence. Currently there are ' + currentUsers.length + ' users online.');
+
     var removeUsers = [];
     for(var ii=0; ii < currentUsers.length; ii++) {
 
@@ -122,7 +128,9 @@ setInterval(function() {
             timeout = 600;
         }
 
-        if(time + timeout < current) {
+        console.log(user.nickName + ' ' + (time + (timeout * 1000) - current));
+
+        if(time + (timeout * 1000) < current) {
             removeUsers.push(ii);
 
             chatEvents.emit('broadcast', {
@@ -135,11 +143,13 @@ setInterval(function() {
 
     }
 
-    currentUsers = currentUsers.filter(function(item) {
-        return (removeUsers.indexOf(item) === -1); 
+    console.log(removeUsers.length + ' users are cleaned up');
+    console.log(removeUsers);
+    currentUsers = currentUsers.filter(function(item,key) {
+        return (removeUsers.indexOf(key) === -1); 
     });
 
-},60000);
+},6000);
 
 
 /* Logging */
@@ -312,3 +322,7 @@ http.createServer(function(request, response) {
     }
 
 }).listen(port);
+
+
+console.log('ChatApp Server v0.2 - (c)2011 by Evert Pot');
+console.log('Now listening for connections on port ' + port);

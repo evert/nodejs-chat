@@ -112,6 +112,7 @@ $(function() {
                         switch(event.type) {
 
                             case 'message' :
+                                console.log('MESSAGE: ' + event.nickName);
                                 self.messageCollection.add({
                                     message : event.message,
                                     nickName : event.nickName,
@@ -120,17 +121,22 @@ $(function() {
                                 });
                                 break;
                             case 'join' :
+                                console.log('JOIN: ' + event.nickName);
                                 self.userCollection.add({
                                     nickName : event.nickName,
                                     gravatar : event.gravatar
                                 });
                                 break;
                             case 'part' :
+                                console.log('PART: ' + event.nickName);
                                 self.userCollection.remove(
                                     self.userCollection.find(
                                         function(item) { return item.get('nickName') === event.nickName; }
                                     )
                                 );
+                                break;
+                            default :
+                                console.log('Unknown event: ' + event.type);
                                 break;
 
                         }
