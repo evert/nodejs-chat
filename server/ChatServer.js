@@ -8,7 +8,6 @@ var
 
 
 var currentUsers = [];
-var messages = [];
 var port = 8080;
 
 /* If the EventEmitter does not have a 'once' method (because it's an older
