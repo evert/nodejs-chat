@@ -209,7 +209,7 @@ http.createServer(function(request, response) {
 
             updateLastSeen({
                 nickName: urlParts.query.nickName,
-                email: urlParts.query.email,
+                email: urlParts.query.email
             });
             chatEvents.emit('broadcast', {
                 type: 'message',
@@ -237,7 +237,7 @@ http.createServer(function(request, response) {
 
             updateLastSeen({
                 nickName: urlParts.query.nickName,
-                email: urlParts.query.email,
+                email: urlParts.query.email
             });
             response.writeHead(200, {'Content-Type' : 'text/plain'});
             response.end('Thanks for joining!');
@@ -266,7 +266,7 @@ http.createServer(function(request, response) {
 
                 updateLastSeen({
                     nickName: urlParts.query.nickName,
-                    email: urlParts.query.email,
+                    email: urlParts.query.email
                 },false);
 
             } else {

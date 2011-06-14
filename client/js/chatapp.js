@@ -117,6 +117,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
                                 gravatar : event.gravatar
                             });
                             break;
+
                         case 'join' :
                             console.log('JOIN: ' + event.nickName);
                             self.userCollection.add({
@@ -124,6 +125,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
                                 gravatar : event.gravatar
                             });
                             break;
+
                         case 'part' :
                             console.log('PART: ' + event.nickName);
                             self.userCollection.remove(
@@ -132,6 +134,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
                                 )
                             );
                             break;
+                        
                         default :
                             console.log('Unknown event: ' + event.type);
                             break;
@@ -302,11 +305,10 @@ window.ChatApp.UserListView = Backbone.View.extend({
 
     removeUser : function(user) {
 
-       $('#user-' + user.get('nickName')).remove(); 
+        $('#user-' + user.get('nickName')).remove();
 
-    },
+    }
 
-    
 });
 
 window.ChatApp.WelcomeView = Backbone.View.extend({
@@ -373,7 +375,8 @@ window.ChatApp.Application = Backbone.View.extend({
             self.initializeConnection();
         });
 
-    }, 
+    },
+
     initializeConnection : function() {
 
         this.connection = new ChatApp.Connection(this.userCollection, this.messageCollection, this.nickName, this.email);
@@ -389,10 +392,10 @@ window.ChatApp.Application = Backbone.View.extend({
         this.userListView = new ChatApp.UserListView({
             collection: this.userCollection,
             el: this.$('section.userList')
-        }); 
+        });
 
 
-    },
+    }
 
 });
 
@@ -402,6 +405,6 @@ window.ChatApp.Application = Backbone.View.extend({
 $(function() {
 
     window.ChatApp.application = new ChatApp.Application;
-   
+
 
 });
