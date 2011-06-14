@@ -81,8 +81,10 @@ window.ChatApp.Connection = function(userCollection, messageCollection, nickName
     this.nickName = nickName;
     this.email = email;
 
-    this.listen();
-    this.join();
+    var self = this;
+    this.join(function() {
+        self.listen();
+    });
 
 };
 _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
@@ -142,9 +144,9 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
 
     },
 
-    join : function() {
+    join : function(onSuccess) {
 
-        $.ajax('/join?nickName=' + this.nickName + '&email=' + this.email);
+        $.ajax('/join?nickName=' + this.nickName + '&email=' + this.email, { success: onSuccess });
 
     },
 
