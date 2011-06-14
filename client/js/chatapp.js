@@ -113,7 +113,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
                             self.messageCollection.add({
                                 message : event.message,
                                 nickName : event.nickName,
-                                dateTime : new Date(event.dateTime),
+                                dateTime : window.ChatApp.parseISO8601(event.dateTime),
                                 gravatar : event.gravatar
                             });
                             break;
@@ -398,6 +398,29 @@ window.ChatApp.Application = Backbone.View.extend({
     }
 
 });
+
+window.ChatApp.parseISO8601 = function(str) {
+ // we assume str is a UTC date ending in 'Z'
+
+ var parts = str.split('T'),
+ dateParts = parts[0].split('-'),
+ timeParts = parts[1].split('Z'),
+ timeSubParts = timeParts[0].split(':'),
+ timeSecParts = timeSubParts[2].split('.'),
+ timeHours = Number(timeSubParts[0]),
+ _date = new Date;
+
+ _date.setUTCFullYear(Number(dateParts[0]));
+ _date.setUTCMonth(Number(dateParts[1])-1);
+ _date.setUTCDate(Number(dateParts[2]));
+ _date.setUTCHours(Number(timeHours));
+ _date.setUTCMinutes(Number(timeSubParts[1]));
+ _date.setUTCSeconds(Number(timeSecParts[0]));
+ if (timeSecParts[1]) _date.setUTCMilliseconds(Number(timeSecParts[1]));
+
+ // by using setUTC methods the date has already been converted to local time(?)
+ return _date;
+}
 
 /**
  * Using jQuery's DOM.ready
