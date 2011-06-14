@@ -1,0 +1,12 @@
+Chat server for Node.js
+=======================
+
+Requirements: nodejs
+
+Instructions
+============
+
+1. cd server
+2. node ChatServer.js
+3. Open http://127.0.0.1/client/index.html
+
