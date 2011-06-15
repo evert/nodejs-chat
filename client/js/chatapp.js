@@ -72,13 +72,19 @@ window.ChatApp.UserCollection = Backbone.Collection.extend({
  *   - messageCollection (an instance of ChatApp.MessageCollection)
  *   - nickName (the current users' nickname)
  *   - email (the current users' email address)
+ *   - serverUri (location of the chat server)
  */
-window.ChatApp.Connection = function(userCollection, messageCollection, nickName, email) {
+window.ChatApp.Connection = function(userCollection, messageCollection, nickName, email, serverUri) {
 
     this.userCollection = userCollection;
     this.messageCollection = messageCollection;
     this.nickName = nickName;
     this.email = email;
+
+    if (!serverUri) { 
+        serverUri = 'http://localhost:8080/';
+    }
+    this.serverUri = serverUri;
 
     var self = this;
     this.join(function() {
@@ -106,7 +112,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
         /**
          * The HTTP long polling request, using jQuery's ajax function
          */
-        $.ajax('/eventpoll?since=' + this.lastSequence + '&nickName=' + this.nickName + '&email=' + this.email, {
+        $.ajax(this.serverUri + 'eventpoll?since=' + this.lastSequence + '&nickName=' + this.nickName + '&email=' + this.email, {
             dataType : 'json',
             complete : function(jqXHR, textStatus) {
                 self.listen();
@@ -123,7 +129,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
      */
     join : function(onSuccess) {
 
-        $.ajax('/join?nickName=' + this.nickName + '&email=' + this.email, { success: onSuccess });
+        $.ajax(this.serverUri + 'join?nickName=' + this.nickName + '&email=' + this.email, { success: onSuccess });
 
     },
 
@@ -132,7 +138,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
      */
     message : function(message) {
 
-        $.ajax('/message?nickName=' + this.nickName + '&email=' + this.email + '&message=' + message);
+        $.ajax(this.serverUri + 'message?nickName=' + this.nickName + '&email=' + this.email + '&message=' + message);
 
     },
 
