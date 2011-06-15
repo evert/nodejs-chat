@@ -81,8 +81,10 @@ window.ChatApp.Connection = function(userCollection, messageCollection, nickName
     this.nickName = nickName;
     this.email = email;
 
-    this.listen();
-    this.join();
+    var self = this;
+    this.join(function() {
+        self.listen();
+    });
 
 };
 _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
@@ -111,10 +113,11 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
                             self.messageCollection.add({
                                 message : event.message,
                                 nickName : event.nickName,
-                                dateTime : new Date(event.dateTime),
+                                dateTime : window.ChatApp.parseISO8601(event.dateTime),
                                 gravatar : event.gravatar
                             });
                             break;
+
                         case 'join' :
                             console.log('JOIN: ' + event.nickName);
                             self.userCollection.add({
@@ -122,6 +125,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
                                 gravatar : event.gravatar
                             });
                             break;
+
                         case 'part' :
                             console.log('PART: ' + event.nickName);
                             self.userCollection.remove(
@@ -130,6 +134,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
                                 )
                             );
                             break;
+                        
                         default :
                             console.log('Unknown event: ' + event.type);
                             break;
@@ -142,9 +147,9 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
 
     },
 
-    join : function() {
+    join : function(onSuccess) {
 
-        $.ajax('/join?nickName=' + this.nickName + '&email=' + this.email);
+        $.ajax('/join?nickName=' + this.nickName + '&email=' + this.email, { success: onSuccess });
 
     },
 
@@ -300,11 +305,10 @@ window.ChatApp.UserListView = Backbone.View.extend({
 
     removeUser : function(user) {
 
-       $('#user-' + user.get('nickName')).remove(); 
+        $('#user-' + user.get('nickName')).remove();
 
-    },
+    }
 
-    
 });
 
 window.ChatApp.WelcomeView = Backbone.View.extend({
@@ -371,7 +375,8 @@ window.ChatApp.Application = Backbone.View.extend({
             self.initializeConnection();
         });
 
-    }, 
+    },
+
     initializeConnection : function() {
 
         this.connection = new ChatApp.Connection(this.userCollection, this.messageCollection, this.nickName, this.email);
@@ -387,12 +392,44 @@ window.ChatApp.Application = Backbone.View.extend({
         this.userListView = new ChatApp.UserListView({
             collection: this.userCollection,
             el: this.$('section.userList')
-        }); 
+        });
 
 
-    },
+    }
 
 });
+
+/**
+ * Parse a UTC date in ISO 8601 format to a Date object.
+ *
+ * Because ISO 8601 is not officially supported (and doesnt work in latest Safari).
+ *
+ * @url http://anentropic.wordpress.com/2009/06/25/javascript-iso8601-parser-and-pretty-dates/
+ *
+ * @param String str
+ */
+window.ChatApp.parseISO8601 = function(str) {
+    var parts = str.split('T'),
+    dateParts = parts[0].split('-'),
+    timeParts = parts[1].split('Z'),
+    timeSubParts = timeParts[0].split(':'),
+    timeSecParts = timeSubParts[2].split('.'),
+    timeHours = Number(timeSubParts[0]),
+    _date = new Date;
+
+    _date.setUTCFullYear(Number(dateParts[0]));
+    _date.setUTCMonth(Number(dateParts[1])-1);
+    _date.setUTCDate(Number(dateParts[2]));
+    _date.setUTCHours(Number(timeHours));
+    _date.setUTCMinutes(Number(timeSubParts[1]));
+    _date.setUTCSeconds(Number(timeSecParts[0]));
+    if (timeSecParts[1]) {
+        _date.setUTCMilliseconds(Number(timeSecParts[1]));
+    }
+
+    // by using setUTC methods the date has already been converted to local time(?)
+    return _date;
+};
 
 /**
  * Using jQuery's DOM.ready
@@ -400,6 +437,6 @@ window.ChatApp.Application = Backbone.View.extend({
 $(function() {
 
     window.ChatApp.application = new ChatApp.Application;
-   
+
 
 });

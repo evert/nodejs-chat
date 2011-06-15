@@ -8,7 +8,6 @@ var
 
 
 var currentUsers = [];
-var messages = [];
 var port = 8080;
 
 /* If the EventEmitter does not have a 'once' method (because it's an older
@@ -210,7 +209,7 @@ http.createServer(function(request, response) {
 
             updateLastSeen({
                 nickName: urlParts.query.nickName,
-                email: urlParts.query.email,
+                email: urlParts.query.email
             });
             chatEvents.emit('broadcast', {
                 type: 'message',
@@ -220,7 +219,7 @@ http.createServer(function(request, response) {
                 gravatar : "http://www.gravatar.com/avatar/" + crypto.createHash('md5').update(urlParts.query.email).digest('hex')
             });
 
-            response.writeHead(200); 
+            response.writeHead(200, {'Content-Type' : 'text/plain'});
             response.end('Thanks for your message!');
             break;
 
@@ -238,9 +237,9 @@ http.createServer(function(request, response) {
 
             updateLastSeen({
                 nickName: urlParts.query.nickName,
-                email: urlParts.query.email,
+                email: urlParts.query.email
             });
-            response.writeHead(200); 
+            response.writeHead(200, {'Content-Type' : 'text/plain'});
             response.end('Thanks for joining!');
             break;
 
@@ -267,7 +266,7 @@ http.createServer(function(request, response) {
 
                 updateLastSeen({
                     nickName: urlParts.query.nickName,
-                    email: urlParts.query.email,
+                    email: urlParts.query.email
                 },false);
 
             } else {
