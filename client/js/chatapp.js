@@ -8,6 +8,11 @@
 window.ChatApp = { };
 
 /**
+ * The server to connect to
+ */
+window.ChatApp.serverUri = 'http://localhost:8080/';
+
+/**
  * Message Model
  * ===================
  *
@@ -414,7 +419,7 @@ window.ChatApp.Application = Backbone.View.extend({
 
     initializeConnection : function() {
 
-        this.connection = new ChatApp.Connection(this.userCollection, this.messageCollection, this.nickName, this.email);
+        this.connection = new ChatApp.Connection(this.userCollection, this.messageCollection, this.nickName, this.email, ChatApp.serverUri);
 
         this.messageListView = new ChatApp.MessageListView({
             collection: this.messageCollection,
