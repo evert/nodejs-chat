@@ -188,21 +188,27 @@ http.createServer(function(request, response) {
         urlParts.pathname = '/client';
     }
 
+    /* Setting the response CORS headers */
+    response.setHeader('Access-Control-Allow-Origin','*'); 
+    response.setHeader('Access-Control-Allow-Methods','GET,POST'); 
+    response.setHeader('Access-Control-Max-Age','3600'); 
+    response.setHeader('Content-Type','application/json'); 
+
     switch(urlParts.pathname) {
 
         case '/message' :
             if (!urlParts.query || !urlParts.query.message) {
-                response.writeHead(400, {'Content-Type' : 'application/json'});
+                response.statusCode = 400;
                 response.end(JSON.stringify({ code : 400, info: "You must specify the 'message' GET variable"}));
                 return;
             }
             if (!urlParts.query.nickName) {
-                response.writeHead(400, {'Content-Type' : 'application/json'});
+                response.statusCode = 400;
                 response.end(JSON.stringify({ code : 400, info: "You must specify the 'nickName' GET variable"}));
                 return;
             }
             if (!urlParts.query.email) {
-                response.writeHead(400, {'Content-Type' : 'application/json'});
+                response.statusCode = 400;
                 response.end(JSON.stringify({ code : 400, info: "You must specify the 'email' GET variable"}));
                 return;
             }
@@ -219,18 +225,18 @@ http.createServer(function(request, response) {
                 gravatar : "http://www.gravatar.com/avatar/" + crypto.createHash('md5').update(urlParts.query.email).digest('hex')
             });
 
-            response.writeHead(200, {'Content-Type' : 'text/plain'});
-            response.end('Thanks for your message!');
+            response.statusCode = 200;
+            response.end(JSON.stringify({ code : 200, info: "Thanks for your message!"}));
             break;
 
         case '/join' :
             if (!urlParts.query || !urlParts.query.nickName) {
-                response.writeHead(400, {'Content-Type' : 'application/json'});
+                response.statusCode = 400;
                 response.end(JSON.stringify({ code : 400, info: "You must specify the 'nickName' GET variable"}));
                 return;
             }
             if (!urlParts.query.email) {
-                response.writeHead(400, {'Content-Type' : 'application/json'});
+                response.statusCode = 400;
                 response.end(JSON.stringify({ code : 400, info: "You must specify the 'email' GET variable"}));
                 return;
             }
@@ -239,18 +245,18 @@ http.createServer(function(request, response) {
                 nickName: urlParts.query.nickName,
                 email: urlParts.query.email
             });
-            response.writeHead(200, {'Content-Type' : 'text/plain'});
-            response.end('Thanks for joining!');
+            response.statusCode = 200;
+            response.end(JSON.stringify({ code : 200, info: "Thanks for joining!"}));
             break;
 
         case '/eventpoll' :
             if (!urlParts.query || !urlParts.query.nickName) {
-                response.writeHead(400, {'Content-Type' : 'application/json'});
+                response.statusCode = 400;
                 response.end(JSON.stringify({ code : 400, info: "You must specify the 'nickName' GET variable"}));
                 return;
             }
             if (!urlParts.query.email) {
-                response.writeHead(400, {'Content-Type' : 'application/json'});
+                response.statusCode = 400;
                 response.end(JSON.stringify({ code : 400, info: "You must specify the 'email' GET variable"}));
                 return;
             }
@@ -261,7 +267,7 @@ http.createServer(function(request, response) {
             var events = chatEvents.getPreviousEvents(since);
             // If there were events, we'll return them right away
             if (events.length > 0) {
-                response.writeHead(200, {'Content-Type' : 'application/json'});
+                response.statusCode = 200;
                 response.end(JSON.stringify(events));
 
                 updateLastSeen({
@@ -281,7 +287,7 @@ http.createServer(function(request, response) {
                         email: urlParts.query.email
                     },false);
 
-                    response.writeHead(200, {'Content-Type' : 'application/json'}); 
+                    response.statusCode = 200;
                     response.end(JSON.stringify([ev]));
                 });
             }
