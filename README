@@ -10,3 +10,8 @@ Instructions
 2. node ChatServer.js
 3. Open http://127.0.0.1:8080/client/index.html in a browser
 
+
+Copyright
+=========
+(c)2011 Ibuildings
+Written by Evert Pot & Boy Baukema
