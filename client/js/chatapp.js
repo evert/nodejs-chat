@@ -450,12 +450,12 @@ window.ChatApp.Application = Backbone.View.extend({
  */
 window.ChatApp.parseISO8601 = function(str) {
     var parts = str.split('T'),
-    dateParts = parts[0].split('-'),
-    timeParts = parts[1].split('Z'),
-    timeSubParts = timeParts[0].split(':'),
-    timeSecParts = timeSubParts[2].split('.'),
-    timeHours = Number(timeSubParts[0]),
-    _date = new Date;
+        dateParts = parts[0].split('-'),
+        timeParts = parts[1].split('Z'),
+        timeSubParts = timeParts[0].split(':'),
+        timeSecParts = timeSubParts[2].split('.'),
+        timeHours = Number(timeSubParts[0]),
+        _date = new Date;
 
     _date.setUTCFullYear(Number(dateParts[0]));
     _date.setUTCMonth(Number(dateParts[1])-1);
