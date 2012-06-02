@@ -1,0 +1,169 @@
+/* Simple resets */
+body {
+    margin: 0;
+    height: 100%;
+    background: grey;
+    font-family: sans-serif;
+    font-size: 14px;
+
+}
+ul,p, h1 {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.template {
+    display: none !important;
+}
+
+.welcome {
+    background-color: #262626;
+    position: absolute; 
+    z-index: 10000;
+    width: 500px;
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    left: 50%;
+    margin-left: -265px;
+    top: 150px;
+
+    h1 {
+        padding-bottom: 20px;
+    }
+
+    label {
+        width: 130px;
+        display: inline-block;
+        margin-top: 15px;
+    }
+    button {
+        display: inline-block;
+        margin-top: 15px;
+        width: 100px;
+    }
+    input {
+        width: 200px;
+        display: inline-block;
+        margin-top: 15px;
+    }
+
+}
+
+.userList {
+
+    width: 200px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid black;
+ 
+    li {
+
+        display: block;
+        margin: 5px;
+        height: 16px;
+        padding: 7px 10px 2px 30px;
+
+        font-size: 80%;
+        color: white;
+        font-weight: bold;
+
+        background-color: #C73;
+
+        /* This is for the gravatar background */
+        background-repeat: no-repeat;
+
+        border-radius: 10px; 
+
+        box-shadow: 3px 3px 5px #222;
+
+        overflow: hidden;
+
+    }
+
+}
+
+.messages {
+    position: fixed;
+    top: 0;
+    right: 200px;
+    bottom: 25px;
+    left: 0;
+    background: white;
+    overflow: auto;
+
+    li {
+        display: block;
+        padding: 4px 20px 5px 65px; 
+        margin: 10px;
+        background: #EEE;
+      
+        /* This is for the gravatar background */
+        background-repeat: no-repeat;
+
+        border-radius: 15px; 
+
+        box-shadow: 3px 3px 5px #CCC;
+
+    }
+
+    .nickName {
+        font-weight: bold;
+        float: left;
+        padding-right: 10px;
+    }
+
+    .messages time {
+        font-size: 90%;
+        color: #555;
+    }
+
+    .messages time:before {
+        font-size: 90%;
+        color: #555;
+        content: "at "
+    }
+
+    p {
+        padding-top: 10px;
+    }
+
+}
+
+.inputArea {
+    background: white; 
+    position: fixed;
+    bottom: 0;
+    height: 25px;
+    left: 0;
+    right: 200px;
+    border-top: 1px solid black; 
+
+    input {
+        border: 0;
+        font-size: 110%;
+        width: 100%;
+    }
+
+    button {
+        display: none;
+        /*
+        display: block;
+        position: fixed;
+        right: 200px;
+        bottom: 0;
+        float: right;
+        border: 0;
+        background: #AACCAA;
+        color: white;
+        font-size: 110%;
+        font-weight: bold;
+        height: 25px;
+        width: 100px;*/
+    }
+
+}
+
