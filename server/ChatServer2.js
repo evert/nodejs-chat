@@ -6,7 +6,7 @@
  * awesome to start with.
  *
  * # The following events are supported:
- * 
+ *
  * ## nick
  *
  * Requires an object like the following:
@@ -17,10 +17,10 @@
  *
  * ## message
  *
- * Requires just a string.  
+ * Requires just a string.
  *
  * # The server broadcasts the following events:
- * 
+ *
  * ## nick
  *
  * This event is emitted whenever a new user connects
@@ -45,7 +45,7 @@
  *   userId : "The users id",
  *
  * ## userList
- * 
+ *
  * This sends an array containing all the current users in the chat.
  * This array looks something like this:
  *
@@ -65,7 +65,7 @@
  *
  */
 
-var 
+var
     io = require('socket.io').listen(8080),
     crypto = require('crypto'),
     users = [];
@@ -94,34 +94,52 @@ io.sockets.on('connection', function(socket) {
     var user = new User();
     socket.set('user', user);
 
-
     socket.on('nick', function(info) {
 
+        if (!info.email || !info.nickName) {
+            socket.emit('error', {
+                message: "Both a nickName and an email property must be supplied"
+            });
+            return;
+        }
         user.email = info.email;
         user.nickName = info.nickName;
         users.push(user);
 
-        socket.broadcast.emit('nick', user.serialize()); 
+        socket.broadcast.emit('join', user.serialize());
         socket.emit('userList', users.map(
-            function(user) { 
-                return user.serialize(); 
+            function(user) {
+                return user.serialize();
             }
         ));
 
     });
 
     socket.on('disconnect', function() {
-        socket.broadcast.emit('part',{
-            nickName : user.nickName,
-            userId : user.id
-        });
+
+        console.log(users);
+        console.log(users.indexOf(user));
+        users.splice(
+            users.indexOf(user),
+            1
+        );
+        console.log(users);
+        socket.broadcast.emit('part', user.serialize());
+
     });
-    socket.on('message', function(message) {
-        socket.broadcast.emit('message',{
-            nickName : user.nickName,
-            userId : user.id,
-            message: message
-        });
+    socket.on('sendMessage', function(message) {
+
+        var payload = user.serialize();
+        payload.message = message;
+        payload.time = new Date();
+        payload.userId = payload.id;
+        delete payload.id;
+
+        // Sending the message back to the user
+        socket.emit('message', payload);
+        // Sending the message to everyone else
+        socket.broadcast.emit('message',payload);
+
     });
 
 });
