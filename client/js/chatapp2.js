@@ -1,20 +1,20 @@
 /**
- * ChatApp namespace
+ * chatapp namespace
  * =================
  *
- * The ChatApp namespace contains all the other objects in this
+ * The chatapp namespace contains all the other objects in this
  * application.
  */
-window.ChatApp = { };
+window.chatapp = { };
 
 /**
  * The server to connect to
  */
-window.ChatApp.serverUri = 'http://localhost:8080/';
+window.chatapp.serverUri = 'http://localhost:8080/';
 
 /**
  * Message Model
- * ===================
+ * =============
  *
  * The message model represents a single message.
  * Messages have the following attributes:
@@ -23,19 +23,19 @@ window.ChatApp.serverUri = 'http://localhost:8080/';
  *   - message
  *   - dateTime
  */
-window.ChatApp.Message = Backbone.Model.extend({
+window.chatapp.Message = Backbone.Model.extend({
 
 });
 
 /**
  * Message Collection 
- * ===================
+ * ==================
  *
  * The messages collection contains the list of messages.
  */
-window.ChatApp.MessageCollection = Backbone.Collection.extend({
+window.chatapp.MessageCollection = Backbone.Collection.extend({
     
-    model: ChatApp.Message
+    model: chatapp.Message
 
 });
 
@@ -48,8 +48,7 @@ window.ChatApp.MessageCollection = Backbone.Collection.extend({
  *   - nickName
  *   - gravatar
  */
-window.ChatApp.User = Backbone.Model.extend({
-
+window.chatapp.User = Backbone.Model.extend({
 
 });
 
@@ -59,9 +58,9 @@ window.ChatApp.User = Backbone.Model.extend({
  *
  * The user collection contains the list of online users.
  */
-window.ChatApp.UserCollection = Backbone.Collection.extend({
+window.chatapp.UserCollection = Backbone.Collection.extend({
     
-    model: ChatApp.User
+    model: chatapp.User
 
 });
 
@@ -73,13 +72,13 @@ window.ChatApp.UserCollection = Backbone.Collection.extend({
  * messages and receiving events.
  *
  * To operate correctly, the following constructor arguments must be passed:
- *   - userCollection (an instance of ChatApp.UserCollection)
- *   - messageCollection (an instance of ChatApp.MessageCollection)
+ *   - userCollection (an instance of chatapp.UserCollection)
+ *   - messageCollection (an instance of chatapp.MessageCollection)
  *   - nickName (the current users' nickname)
  *   - email (the current users' email address)
  *   - serverUri (location of the chat server)
  */
-window.ChatApp.Connection = function(userCollection, messageCollection, nickName, email, serverUri) {
+window.chatapp.Connection = function(userCollection, messageCollection, nickName, email, serverUri) {
 
     this.userCollection = userCollection;
     this.messageCollection = messageCollection;
@@ -90,53 +89,35 @@ window.ChatApp.Connection = function(userCollection, messageCollection, nickName
         serverUri = 'http://localhost:8080/';
     }
     this.serverUri = serverUri;
-
     var self = this;
-    this.join(function() {
-        self.listen();
-    });
+
+    this.connect();
 
 };
 /**
  * Extending the Backbone 'Events' object
  */
-_.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
+_.extend(window.chatapp.Connection.prototype, Backbone.Events, {
 
     userCollection : null,
     messageCollection : null,
-    lastSequence : 0,
+    connection : null,
 
     /**
      * Calling the listen function will open up a long-polling connection to
      * the chat server.
      */
-    listen : function() {
+    connect : function() {
 
         var self = this;
-
-        /**
-         * The HTTP long polling request, using jQuery's ajax function
-         */
-        $.ajax(this.serverUri + 'eventpoll?since=' + this.lastSequence + '&nickName=' + this.nickName + '&email=' + this.email, {
-            dataType : 'json',
-            complete : function(jqXHR, textStatus) {
-                self.listen();
-            },
-            success : function(data) {
-                self.parseEvents(data);
-            }
+        connection = io.connect(this.serverUri);
+        connection.emit('nick', {
+            nickName : this.nickName,
+            email : this.email
         });
-    },
-
-    /**
-     * Calling the join function will let the server know we're here, and cause
-     * the current user to be added to the userlist.
-     */
-    join : function(onSuccess) {
-
-        $.ajax(this.serverUri + 'join?nickName=' + this.nickName + '&email=' + this.email, { success: onSuccess });
 
     },
+
 
     /**
      * The message function sends a chat-message to the server
@@ -164,7 +145,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
                     this.messageCollection.add({
                         message : event.message,
                         nickName : event.nickName,
-                        dateTime : window.ChatApp.parseISO8601(event.dateTime),
+                        dateTime : window.chatapp.parseISO8601(event.dateTime),
                         gravatar : event.gravatar
                     });
                     break;
@@ -206,7 +187,7 @@ _.extend(window.ChatApp.Connection.prototype, Backbone.Events, {
  * You must pass a 'collection' option, which should be an instance of
  * MessageCollection
  */
-window.ChatApp.MessageListView = Backbone.View.extend({
+window.chatapp.MessageListView = Backbone.View.extend({
 
     initialize : function() {
 
@@ -243,9 +224,9 @@ window.ChatApp.MessageListView = Backbone.View.extend({
         newElem.css({
             backgroundImage: "url('" + message.get('gravatar') + "?s=55&d=retro')"
         });
-        this.el.append(newElem);
+        this.$el.append(newElem);
 
-        this.el.scrollTop(this.el[0].scrollHeight);
+        this.$el.scrollTop(this.el.scrollHeight);
 
     }
     
@@ -260,9 +241,9 @@ window.ChatApp.MessageListView = Backbone.View.extend({
  * send a message to the chatroom.
  *
  * You must pass a 'connection' option, which should be an instance of
- * ChatApp.connection 
+ * chatapp.connection 
  */
-window.ChatApp.MessageInputView = Backbone.View.extend({
+window.chatapp.MessageInputView = Backbone.View.extend({
 
     events: {
         "submit form" : "submitMessage"
@@ -307,7 +288,7 @@ window.ChatApp.MessageInputView = Backbone.View.extend({
  * You must pass a 'collection' option, which should be an instance of
  * UserCollection
  */
-window.ChatApp.UserListView = Backbone.View.extend({
+window.chatapp.UserListView = Backbone.View.extend({
 
     initialize : function() {
 
@@ -336,7 +317,7 @@ window.ChatApp.UserListView = Backbone.View.extend({
         newElem.css({
             backgroundImage: "url('" + user.get('gravatar') + "?s=25&d=retro')"
         });
-        this.el.append(newElem);
+        this.$el.append(newElem);
 
     },
 
@@ -351,7 +332,7 @@ window.ChatApp.UserListView = Backbone.View.extend({
 /**
  * The WelcomeView is responsible for handling the login screen
  */
-window.ChatApp.WelcomeView = Backbone.View.extend({
+window.chatapp.WelcomeView = Backbone.View.extend({
 
     events : {
         "submit form" : "connect"
@@ -360,7 +341,7 @@ window.ChatApp.WelcomeView = Backbone.View.extend({
     connect : function(evt) {
 
         evt.preventDefault();
-        this.el.hide();
+        this.$el.hide();
         var nickName = this.$('input[name=nickName]').val();
         var email = this.$('input[name=email]').val();
 
@@ -380,7 +361,7 @@ window.ChatApp.WelcomeView = Backbone.View.extend({
  * The Application View is basically the main Application controller, and
  * is responsible for setting up all the other objects.
  */
-window.ChatApp.Application = Backbone.View.extend({
+window.chatapp.Application = Backbone.View.extend({
 
     messageCollection : null,
     userCollection : null,
@@ -401,12 +382,12 @@ window.ChatApp.Application = Backbone.View.extend({
 
         var self = this;
 
-        this.messageCollection = new ChatApp.MessageCollection();
-        this.userCollection = new ChatApp.UserCollection();
+        this.messageCollection = new chatapp.MessageCollection();
+        this.userCollection = new chatapp.UserCollection();
 
 
 
-        this.welcomeView = new ChatApp.WelcomeView({
+        this.welcomeView = new chatapp.WelcomeView({
             el : this.$('section.welcome')
         });
         this.welcomeView.bind('connect', function(userInfo) {
@@ -419,17 +400,17 @@ window.ChatApp.Application = Backbone.View.extend({
 
     initializeConnection : function() {
 
-        this.connection = new ChatApp.Connection(this.userCollection, this.messageCollection, this.nickName, this.email, ChatApp.serverUri);
+        this.connection = new chatapp.Connection(this.userCollection, this.messageCollection, this.nickName, this.email, chatapp.serverUri);
 
-        this.messageListView = new ChatApp.MessageListView({
+        this.messageListView = new chatapp.MessageListView({
             collection: this.messageCollection,
             el : this.$('section.messages')
         });
-        this.messageInputView = new ChatApp.MessageInputView({
+        this.messageInputView = new chatapp.MessageInputView({
             connection: this.connection,
             el: this.$('section.inputArea')
         }); 
-        this.userListView = new ChatApp.UserListView({
+        this.userListView = new chatapp.UserListView({
             collection: this.userCollection,
             el: this.$('section.userList')
         });
@@ -448,7 +429,7 @@ window.ChatApp.Application = Backbone.View.extend({
  *
  * @param String str
  */
-window.ChatApp.parseISO8601 = function(str) {
+window.chatapp.parseISO8601 = function(str) {
     var parts = str.split('T'),
         dateParts = parts[0].split('-'),
         timeParts = parts[1].split('Z'),
@@ -476,7 +457,7 @@ window.ChatApp.parseISO8601 = function(str) {
  */
 $(document).ready(function() {
 
-    window.ChatApp.application = new ChatApp.Application;
+    window.chatapp.application = new chatapp.Application;
 
 
 });
