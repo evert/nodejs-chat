@@ -44,24 +44,24 @@ ChatApp.Application.prototype = {
         var welcomeView = new ChatApp.View.Welcome({
             el : $('section.welcome'),
         });
-        this.userListView = new ChatApp.View.UserList({
+        var userListView = new ChatApp.View.UserList({
             el : $('section.userList'),
             collection : this.userList
         });
-        this.inputAreaView = new ChatApp.View.InputArea({
+        var inputAreaView = new ChatApp.View.InputArea({
             el : $('section.inputArea')
         });
-        this.messageListView = new ChatApp.View.MessageList({
+        var messageListView = new ChatApp.View.MessageList({
             el : $('section.messages'),
             collection : this.messageList
         });
 
-
+        var self = this;
         welcomeView.on('submit', function(userInfo) {
-            this.connection.connect(userInfo.nickName, userInfo.email);
+            self.connection.connect(userInfo.nickName, userInfo.email);
         });
         inputAreaView.on('message', function(message) {
-            this.connection.message(message);
+            self.connection.message(message);
         });
 
     },
