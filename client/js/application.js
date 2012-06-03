@@ -41,28 +41,23 @@ ChatApp.Application.prototype = {
      */
     initViews : function() {
 
-        var welcomeView = new ChatApp.View.Welcome({
-            el : $('section.welcome'),
-        });
-        var userListView = new ChatApp.View.UserList({
-            el : $('section.userList'),
-            collection : this.userList
-        });
-        var inputAreaView = new ChatApp.View.InputArea({
-            el : $('section.inputArea')
-        });
-        var messageListView = new ChatApp.View.MessageList({
-            el : $('section.messages'),
-            collection : this.messageList
-        });
+        /* The 'welcome' view */
 
-        var self = this;
-        welcomeView.on('submit', function(userInfo) {
-            self.connection.connect(userInfo.nickName, userInfo.email);
-        });
-        inputAreaView.on('message', function(message) {
-            self.connection.message(message);
-        });
+        //var welcomeView = new ChatApp.View.Welcome({
+        //    el : $('section.welcome'),
+        //});
+
+        /* The 'userlist' view */
+
+        //var userListView = new ChatApp.View.UserList({
+        //    el : $('section.userList'),
+        //    collection : this.userList
+        //});
+
+        /* The 'inputArea' view */
+
+
+        /* The 'messagelist' view */
 
     },
 
