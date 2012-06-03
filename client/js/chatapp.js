@@ -18,31 +18,6 @@ ChatApp.serverUrl = 'http://localhost:8080/';
  */
 $(document).ready(function() {
 
-    var userList = new ChatApp.Model.UserList();
-    var messageList = new ChatApp.Model.MessageList();
-
-    var welcomeView = new ChatApp.View.Welcome({
-        el : $('section.welcome')
-    });
-    var userListView = new ChatApp.View.UserList({
-        el : $('section.userList'),
-        collection : userList
-    });
-    var inputAreaView = new ChatApp.View.InputArea({
-        el : $('section.inputArea')
-    });
-    var messageListView = new ChatApp.View.MessageList({
-        el : $('section.messages'),
-        collection : messageList
-    });
-
-    var connection = new ChatApp.Connection(userList, messageList);
-
-    welcomeView.on('submit', function(userInfo) {
-        connection.connect(userInfo.nickName, userInfo.email);
-    });
-    inputAreaView.on('message', function(message) {
-        connection.message(message);
-    });
+    var app = new ChatApp.Application();
 
 });
