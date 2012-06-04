@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<head>
+    <title>Backbone chat</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        h2 {
+            border-bottom: 1px solid #444;
+        }
+        code {
+            display: block;
+            background: #ddd;
+            border: 1px solid #eee;
+            padding: 3px;
+            margin: 3px;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Backbone chat resources</h1>
+
+    <h2>Useful links</h2>
+
+    <ul>
+        <li><a href="http://backbonejs.org/">Backbone.js documentation</a></li>
+        <li><a href="http://documentcloud.github.com/underscore/">Underscore.js documentation</a></li>
+        <li><a href="http://docs.jquery.com/Main_Page">jQuery documentation</a></li>
+        <li><a href="http://lesscss.org/">LESS documentation</a></li>
+    </ul>
+
+    <h2>Steps</h2>
+
+    <h3>Step 1: building the models</h3>
+
+    <h4>ChatApp.Model.User</h4>
+
+    <ul>
+        <li>id</li>
+        <li>nickName</li>
+        <li>gravatar</li>
+    </ul>
+
+    <h4>ChatApp.Model.Message</h4>
+
+    <ul>
+        <li>message</li>
+        <li>userId</li>
+        <li>nickName</li>
+        <li>gravatar</li>
+        <li>time</li>
+    </ul>
+
+    <h3>Step 2: building the collections</h3>
+
+    <ul>
+        <li>ChatApp.Model.UserList</li>
+        <li>ChatApp.Model.MessageList</li>
+    </ul>
+
+    <h3>Step 3: The welcome view</h3>
+
+    <ul>
+        <li>Build ChatApp.View.Welcome.</li>
+        <li>This has to be done in view.welcome.js</li>
+        <li>Handle the form submit event.</li>
+        <li>From this event handler, trigger this event:
+            <code>
+                // Triggering the 'submit' event<br />
+                this.trigger('submit', {<br />
+                &nbsp;&nbsp;nickName : nickName,<br />
+                &nbsp;&nbsp;email    : email<br />
+                });
+            </code>
+        </li>
+        <li>Instantiate the view from the Application class.</li>
+        <li>Hint: You are supposed to use the 'events' property from backbone views.</li>
+        <li>Hint 2: You should use 'form submit'.</li>
+        <li>Hint 3: Don't forget to cancel the default browser behaviour with 'ev.preventDefault'.</li>
+    </ul>
+
+    <h3>Step 4: Hooking up the connection</h3>
+
+    <ul>
+        <li>From within the Application class, listen to the 'submit' event coming from the welcome view.</li>
+        <li>You can do this within the 'initViews' method.</li>
+        <li>When this event is triggered, the following code is executed:
+            <code>
+                var self = this;
+                    &nbsp;&nbsp;welcomeView.on('submit', function(userInfo) {
+                    &nbsp;&nbsp;self.connection.connect(userInfo.nickName, userInfo.email);
+                });
+            </code>
+        </li>
+    </ul>
+
+    <h3>Step 5: The User List</h3>
+
+    <ul>
+        <li>Create ChatApp.View.UserList</li>
+        <li>This has to be done in view.userlist.js</li>
+        <li>Create an initialize() method</li>
+        <li>In this method, bind 2 events:
+            <code>
+                var self = this;
+                this.collection.bind('add', function(user) {
+                &nbsp;&nbsp;self.addUser(user);
+                });
+
+                this.collection.bind('remove', function(user) {
+                &nbsp;&nbsp;self.removeUser(user);
+                });
+            </code>
+        </li>
+    </ul>
+
+    <h3>Step 6: Implement addUser</h3>
+
+    <ul>
+        <li>Now implement the addUser method</li>
+        <li>Clone the template element</li>
+        <li>Remove the 'template' css class</li>
+        <li>Set the nickname</li>
+        <li>Add the element back to the DOM</li>
+        <li>Hint: to get the nickname, call user.get('nickName')</li>
+        <li>Don't forget to instantiate this view in the Application class!</li>
+    </ul>
+    
+    <h3>Step 7: Implement removeUser</h3>
+
+    <ul>
+        <li>Create the MessageInput view
+            <ul>
+                <li>Similar to the Welcome view</li>
+                <li>Trigger a 'message' event</li>
+                <li>Bind the message event in the Application class</li>
+                <li>Call this.connection.message(message)</li>
+            </ul>
+        </li>
+        <li>Create the MessageList view
+            <ul>
+                <li>Similar to the UserList view</li>
+                <li>But only bind an 'add' event</li>
+            </ul>
+        </li>
+        
+    </ul>
+
+</body>
