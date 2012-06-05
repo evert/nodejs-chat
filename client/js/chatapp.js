@@ -10,7 +10,7 @@ window.ChatApp = {
 /**
  * This is the socket.io server we will be connecting to.
  */
-ChatApp.serverUrl = 'http://localhost:8080/';
+ChatApp.serverUrl = 'http://192.168.90.23:8080/';
 
 /**
  * We only actually start executing the javascript, once the dom is fully
