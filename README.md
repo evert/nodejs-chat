@@ -39,7 +39,7 @@ Copyright
 
 (c)2011-2013 Evert Pot
 
-Thanks to Boy Baukema
+Thanks to Boy Baukema for suggestions and bugfixes.
 
 [1]: http://nodejs.org/
 [2]: http://backbonejs.org/
